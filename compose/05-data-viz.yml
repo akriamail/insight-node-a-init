@@ -1,0 +1,16 @@
+services:
+  nocodb:
+    image: nocodb/nocodb:latest
+    container_name: insight-nocodb
+    restart: always
+    environment:
+      # 替换为你 .env 里的真实密码
+      - NC_DB=pg://insight-db:5432?u=insight_admin&p=你的密码&d=postgres
+    volumes:
+      - /opt/insight-ai/05-data-viz/data:/usr/app/data
+    networks:
+      - insight-net
+
+networks:
+  insight-net:
+    external: true

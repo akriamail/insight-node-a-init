@@ -1,0 +1,19 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: insight-n8n
+    restart: always
+    environment:
+      - N8N_HOST=flow.insight.akria.net
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://flow.insight.akria.net/
+    volumes:
+      - /opt/insight-ai/04-workflow/data:/home/node/.n8n
+    networks:
+      - insight-net
+
+networks:
+  insight-net:
+    external: true
