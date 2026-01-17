@@ -11,3 +11,16 @@
    - 解决: 将镜像从非官方路径更换为官方镜像 `requarks/wiki:2`。
 3. **域名无法访问 (Empty Response)**:
    - 解决: 确保 `06-knowledge.yml` 中配置了 `networks: insight-net` 且声明为 `external: true`。
+# 🛠 故障处理 (Troubleshooting)
+
+### ⚠️ NocoDB 重启 (Database Connection Error)
+- **原因**: 密码包含特殊字符（如 `@`, `#`）在 `NC_DB` URL 字符串中未编码。
+- **解决**: 使用 URL 编码替换字符。`@` -> `%40`, `#` -> `%23`。
+
+### ⚠️ n8n 无法启动 (Permission Denied)
+- **原因**: `/opt/insight-ai/04-workflow/data` 权限不属于 UID 1000。
+- **解决**: 执行 `chown -R 1000:1000 [目录路径]`。
+
+### ⚠️ 变量读取失效 (Env Not Found)
+- **原因**: 在 `compose/` 目录下执行命令时无法自动读取上级目录的 `.env`。
+- **解决**: 使用 `docker compose --env-file ../.env` 执行。
