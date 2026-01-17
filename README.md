@@ -18,11 +18,18 @@
 | **NPM** | `gw.insight.akria.net` | 域名转发与 SSL 管理 | `postgres` |
 
 ## 📁 项目目录结构
-├── /compose/ # 核心服务的 Docker Compose 定义文件
-├── /configs/ # 各类服务的配置文件 (如 Teleport.yaml)
-├── /scripts/ # 常用运维脚本
-├── DOMAINS.md # 域名分配及端口映射清单
-└── TROUBLESHOOTING.md # 常见故障处理记录
+/opt/insight-ai/
+├── insight-node-a-init/      # <--- 你的配置仓库 (Git 管理)
+│   ├── compose/              # 所有业务的 .yml
+│   ├── scripts/              # [新] startup.sh, shutdown.sh, backup.sh
+│   ├── .env                  # 环境变量
+│   └── .gitignore            # 保护敏感文件
+│
+├── 01-gateway/               # <--- 以下全是各个容器的“硬盘映射”(Data)
+├── 03-databases/
+├── 04-workflow/
+├── ...
+└── backups/                  # <--- 定期备份的压缩包
 ## 🚀 快速启动指南
 
 1.  **环境准备**: 确保宿主机已安装 Docker 和 Docker Compose。
