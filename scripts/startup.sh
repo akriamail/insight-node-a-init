@@ -1,28 +1,30 @@
 #!/bin/bash
 
-# --- Project Team Node-A 一键启动脚本 v1.00 ---
-COMPOSE_DIR="/opt/insight-ai/insight-node-a-init/compose"
+# --- Project Team Node-A 一键启动脚本 (v1.0.0 完整版) ---
 
-echo "🚀 Starting Project Team Node-A Services..."
+# 1. 自动定位路径（核心逻辑）
+# 获取脚本所在目录的上一级，即仓库根目录
+REPO_DIR=$(cd "$(dirname "$0")/.."; pwd)
+COMPOSE_DIR="$REPO_DIR/compose"
+ENV_FILE="$REPO_DIR/.env"
 
-# 1. 检查并拉起基础网络服务 (Gateway & Security)
-echo "--- [1/3] Launching Infrastructure ---"
-docker compose -f $COMPOSE_DIR/01-gateway.yml up -d
+echo "🚀 Project Team Node-A 正在从以下路径启动:"
+echo "📂 根目录: $REPO_DIR"
 
-# 2. 拉起数据底座 (必须在应用启动前 Ready)
-echo "--- [2/3] Launching Database ---"
-docker compose -f $COMPOSE_DIR/03-databases.yml up -d
+# 2. 依次拉起服务
+echo "--- [1/4] 启动流量网关 ---"
+docker compose -f $COMPOSE_DIR/01-gateway.yml --env-file $ENV_FILE up -d
 
-# 稍微等待数据库初始化，防止应用连接过快导致报错
-echo "Waiting for database to settle..."
-sleep 5
+echo "--- [2/4] 启动数据底座 ---"
+docker compose -f $COMPOSE_DIR/03-databases.yml --env-file $ENV_FILE up -d
 
-# 3. 按序拉起所有业务应用
-echo "--- [3/3] Launching Applications ---"
-docker compose -f $COMPOSE_DIR/04-workflow.yml up -d
-docker compose -f $COMPOSE_DIR/05-data-viz.yml up -d
-docker compose -f $COMPOSE_DIR/06-knowledge.yml up -d
+echo "--- [3/4] 启动业务应用 (n8n & NocoDB) ---"
+docker compose -f $COMPOSE_DIR/04-workflow.yml --env-file $ENV_FILE up -d
+docker compose -f $COMPOSE_DIR/05-data-viz.yml --env-file $ENV_FILE up -d
 
-echo "✅ All services initiated!"
+echo "--- [4/4] 启动团队知识库 ---"
+docker compose -f $COMPOSE_DIR/06-knowledge.yml --env-file $ENV_FILE up -d
+
+echo "✅ 所有服务已拉起！"
 echo "--------------------------------------"
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+docker ps

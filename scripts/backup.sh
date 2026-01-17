@@ -1,35 +1,33 @@
 #!/bin/bash
 
-# --- Project Team Node-A 数据库自动备份脚本 v1.00 ---
+# --- Project Team Node-A 综合备份脚本 (v1.0.0 完整版) ---
 
-# 配置区
-BACKUP_DIR="/opt/insight-ai/backups/postgres"
-RETENTION_DAYS=7
+# 1. 自动定位路径
+REPO_DIR=$(cd "$(dirname "$0")/.."; pwd)
+PARENT_DIR=$(cd "$REPO_DIR/.."; pwd)  # 获取 /opt/insight-ai 目录
+BACKUP_ROOT="$PARENT_DIR/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-CONTAINER_NAME="insight-db"
-DB_USER="insight_admin"
-DB_NAME="n8n_db"
-# 这里的密码直接硬编码，确保脚本独立运行时不会因为变量丢失而失败
+RETENTION_DAYS=7
+
+# 2. 创建备份目录
+mkdir -p $BACKUP_ROOT/postgres
+mkdir -p $BACKUP_ROOT/gateway
+
+echo "📂 开始备份 Project Team Node-A 数据..."
+
+# 3. 备份 Postgres 数据库 (n8n & NocoDB)
 export PGPASSWORD='z1a2q3W4!@#'
+echo "--- [1/2] 正在导出 Postgres 数据库... ---"
+docker exec insight-db pg_dump -U insight_admin n8n_db | gzip > $BACKUP_ROOT/postgres/n8n_db_$TIMESTAMP.sql.gz
 
-# 1. 创建备份目录
-mkdir -p $BACKUP_DIR
+# 4. 备份 NPM 全部配置 (包含核心数据库及 SSL 证书)
+# 我们直接打包整个 01-gateway 目录，这是最稳妥的恢复方式
+echo "--- [2/2] 正在打包 NPM 配置文件与 SSL 证书... ---"
+tar -czf $BACKUP_ROOT/gateway/npm_full_config_$TIMESTAMP.tar.gz -C $PARENT_DIR/01-gateway .
 
-echo "📂 Starting backup for $DB_NAME..."
+# 5. 清理过期备份 (只保留 7 天)
+echo "🧹 正在清理 $RETENTION_DAYS 天前的旧备份..."
+find $BACKUP_ROOT -type f -mtime +$RETENTION_DAYS -exec rm {} \;
 
-# 2. 执行热备份 (导出为压缩的 .sql.gz)
-docker exec $CONTAINER_NAME pg_dump -U $DB_USER $DB_NAME | gzip > $BACKUP_DIR/${DB_NAME}_$TIMESTAMP.sql.gz
-
-# 3. 检查备份是否成功
-if [ $? -eq 0 ]; then
-    echo "✅ Backup completed: $BACKUP_DIR/${DB_NAME}_$TIMESTAMP.sql.gz"
-else
-    echo "❌ Backup failed!"
-    exit 1
-fi
-
-# 4. 清理旧备份 (只保留最近 7 天的)
-echo "🧹 Cleaning up backups older than $RETENTION_DAYS days..."
-find $BACKUP_DIR -type f -name "*.sql.gz" -mtime +$RETENTION_DAYS -exec rm {} \;
-
-echo "✨ All done!"
+echo "✅ 备份完成！"
+echo "📍 备份文件存放位置: $BACKUP_ROOT"
