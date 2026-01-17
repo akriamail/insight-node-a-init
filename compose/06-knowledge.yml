@@ -1,9 +1,11 @@
 services:
   wiki:
-    image: requarks/wiki:2  # 修正为官方镜像
+    image: requarks/wiki:2
     container_name: insight-wiki
-    # ... 其余配置保持不变 ...
     restart: always
+    # 必须添加下面这两行，否则外部（包括浏览器和宿主机防火墙）看不到 3000 端口
+    ports:
+      - "3000:3000"
     environment:
       DB_TYPE: postgres
       DB_HOST: insight-db
@@ -16,7 +18,6 @@ services:
     networks:
       - insight-net
 
-        # 重点：必须在最外层添加这段声明
 networks:
   insight-net:
     external: true
