@@ -1,6 +1,5 @@
 # Project Team Node-A: 数字化大脑
 
-这是 **Project Team** (21人工厂项目) 的核心基础设施管理仓库。本节点 (Node-A) 承载了知识管理、安全准则及数据库中枢。
 
 ## 🏗️ 架构概览
 
@@ -25,7 +24,6 @@
 4. **启动知识库**: `docker compose -f compose/06-knowledge.yml up -d`
 
 ## 🔐 安全与准则
-- 所有的 `.ai` 域名已废弃，现统一使用 `.akria.net`。
 - 数据库超级管理员为 `insight_admin`。
 - 生产环境修改配置后，必须通过 Git 同步至本仓库。
 
