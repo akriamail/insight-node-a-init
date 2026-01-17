@@ -1,0 +1,24 @@
+version: v3
+teleport:
+  nodename: insight-node-a
+  data_dir: /var/lib/teleport
+  log:
+    output: stderr
+    severity: INFO
+auth_service:
+  enabled: "yes"
+  listen_addr: 0.0.0.0:3025
+  # 修正为你的实际 akria.net 域名
+  public_addr: gateway.insight.akria.net:3025
+  proxy_listener_mode: multiplex
+proxy_service:
+  enabled: "yes"
+  listen_addr: 0.0.0.0:3080
+  # 修正为你的实际访问地址
+  public_addr: gateway.insight.akria.net:4443
+  # 暂时留空，让 Teleport 自动生成自签名证书，后续稳了再换 NPM 的
+  https_keypairs: []
+ssh_service:
+  enabled: "yes"
+  labels:
+    env: project-team

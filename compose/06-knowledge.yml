@@ -1,0 +1,22 @@
+services:
+  wiki:
+    image: requarks/wiki:2  # 修正为官方镜像
+    container_name: insight-wiki
+    # ... 其余配置保持不变 ...
+    restart: always
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: insight-db
+      DB_PORT: 5432
+      DB_USER: wikijs
+      DB_PASS: wiki_secure_pass_2026
+      DB_NAME: wikijs
+    volumes:
+      - /opt/insight-ai/06-knowledge/data:/wiki/storage
+    networks:
+      - insight-net
+
+        # 重点：必须在最外层添加这段声明
+networks:
+  insight-net:
+    external: true
