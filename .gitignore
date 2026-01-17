@@ -1,2 +1,6 @@
 .env
 .env.bak
+**/data/
+**/pgdata/
+**/letsencrypt/
+*.bak
