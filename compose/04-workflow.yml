@@ -1,31 +1,23 @@
-version: '3.8'
-
 services:
   n8n:
     image: n8nio/n8n:latest
     container_name: insight-n8n
     restart: always
+    # 直接引用环境文件
     environment:
-      # --- 基础网络配置 ---
       - N8N_HOST=flow.insight.akria.net
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - NODE_ENV=production
       - WEBHOOK_URL=https://flow.insight.akria.net/
-      
-      # --- 数据库安全配置 ---
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=insight-db
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=n8n_db
       - DB_POSTGRESDB_USER=insight_admin
-      # 关键修复：z1a2q3W4!@# -> z1a2q3W4!%40%23
-      # 使用 URL 编码规避 SCRAM-SERVER-FIRST-MESSAGE 错误
       - DB_POSTGRESDB_PASSWORD='z1a2q3W4!@#'
-      # --- 时区配置 ---
       - GENERIC_TIMEZONE=Asia/Shanghai
       - TZ=Asia/Shanghai
-      
     volumes:
       - /opt/insight-ai/04-workflow/data:/home/node/.n8n
     networks:
